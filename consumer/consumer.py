@@ -89,7 +89,7 @@ def connect_postgres(retries: int = 10):
 
 
 def write_to_postgres(conn, log_entry: dict):
-    with:
+    with DB_WRITE_LATENCY.time():
         try:
             with conn.cursor() as cur:
                 cur.execute(INSERT_LOG_SQL, {
