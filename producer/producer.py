@@ -7,6 +7,7 @@ import json
 import random
 import time
 import uuid
+import os
 import logging
 from datetime import datetime, timezone
 
@@ -101,7 +102,7 @@ def create_producer(bootstrap_servers: str, retries: int = 10) -> KafkaProducer:
 
 
 def main():
-    kafka_bootstrap = "localhost:9092"
+    kafka_bootstrap = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
     topic = "app-logs"
     produce_interval = 0.5
 

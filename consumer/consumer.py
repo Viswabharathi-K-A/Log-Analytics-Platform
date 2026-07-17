@@ -6,6 +6,7 @@ Exposes Prometheus metrics on :8001/metrics.
 import json
 import logging
 import time
+import os
 
 import psycopg2
 import redis
@@ -34,11 +35,11 @@ ERROR_RATE_GAUGE = Gauge("consumer_error_rate_1m", "Error log rate per service",
 PROCESSING_ERRORS = Counter("consumer_processing_errors_total", "Unhandled processing errors")
 
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "dbname": "loganalytics",
-    "user": "loguser",
-    "password": "logpass",
+    "host": os.getenv("POSTGRES_HOST", "localhost"),
+    "port": int(os.getenv("POSTGRES_PORT", 5432)),
+    "dbname": os.getenv("POSTGRES_DB", "loganalytics"),
+    "user": os.getenv("POSTGRES_USER", "loguser"),
+    "password": os.getenv("POSTGRES_PASSWORD", "logpass"),
 }
 
 CREATE_TABLE_SQL = """
@@ -112,7 +113,11 @@ def write_to_postgres(conn, log_entry: dict):
             raise
 
 
-REDIS_CONFIG = {"host": "localhost", "port": 6379, "decode_responses": True}
+REDIS_CONFIG = {
+    "host": os.getenv("REDIS_HOST", "localhost"),
+    "port": int(os.getenv("REDIS_PORT", 6379)),
+    "decode_responses": True,
+}
 
 
 def connect_redis(retries: int = 10):
@@ -190,7 +195,7 @@ def main():
 
     pg_conn = connect_postgres()
     redis_client = connect_redis()
-    consumer = create_consumer("localhost:9092", "app-logs")
+    consumer = create_consumer(os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"), "app-logs")
 
     gauge_refresh_interval = 10
     last_gauge_refresh = time.time()
