@@ -195,7 +195,9 @@ Log_Analytics_Platform/
 
 ## ☸️ Kubernetes
 
-Manifests in `k8s/` cover production-like deployment:
+Full stack deployed on Kubernetes with HorizontalPodAutoscaler autoscaling.
+
+![Kubernetes Pods](assets/kubernetes-pods.png)
 
 ```bash
 kubectl apply -f k8s/
@@ -208,10 +210,9 @@ kubectl get hpa -n log-analytics
 - `ConfigMap` — Kafka bootstrap servers, PostgreSQL and Redis connection config
 - `Secret` — database credentials
 - `Deployment` — producer (2 replicas) and consumer (3 replicas)
+- `StatefulSet` — PostgreSQL and Redis with persistent volume claims
 - `Service` — internal networking for metrics scraping
-- `HorizontalPodAutoscaler` — consumer scales from 2→10 pods at 60% CPU; producer scales 1→5 at 70% CPU
-
----
+- `HorizontalPodAutoscaler` — consumer scales 2→10 pods at 60% CPU; producer scales 1→5 at 70% CPU
 
 ## 🔬 Design Decisions
 
