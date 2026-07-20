@@ -225,14 +225,3 @@ Redis handles thousands of increments per second in memory. Hitting PostgreSQL o
 Ensures Kafka acknowledges a message only after all in-sync replicas have written it — no message loss even if a broker fails immediately after receiving a message.
 
 ---
-
-## 📐 What Would You Do at 10x Scale?
-
-- **Multiple Kafka partitions** — scale consumer replicas via HPA, each handling a partition subset for parallel processing
-- **TimescaleDB** instead of vanilla PostgreSQL — automatic time-based chunk compression for log data
-- **Dead-letter topic** — unparseable or failed messages routed to `app-logs-dlq` for inspection
-- **Confluent Schema Registry** — version log schemas, prevent breaking changes across producer/consumer deployments
-- **3-node Kafka cluster** — replication factor 3 for fault tolerance; survive one broker failure
-- **Kafka Streams or Faust** — stateful stream processing for per-user aggregations without hitting the database
-
----
