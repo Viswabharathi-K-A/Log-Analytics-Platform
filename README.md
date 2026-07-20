@@ -195,13 +195,6 @@ Log_Analytics_Platform/
 
 ## ☸️ Kubernetes
 
-<<<<<<< HEAD
-=======
-## ☸️ Kubernetes
-
->>>>>>> ce9ec9e (docs: Update Kubernetes section in README)
-Full stack deployed on Kubernetes with HorizontalPodAutoscaler autoscaling.
-
 ![Kubernetes Pods](assets/kubernetes-pods.png)
 
 ```bash
