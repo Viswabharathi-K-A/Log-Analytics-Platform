@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-consumer
+  namespace: log-analytics
+  labels:
+    app: log-consumer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: log-consumer
+  template:
+    metadata:
+      labels:
+        app: log-consumer
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: consumer
+          image: log-consumer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8001
+              name: metrics
+          envFrom:
+            - configMapRef:
+                name: log-analytics-config
+            - secretRef:
+                name: log-analytics-secrets
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8001
+            initialDelaySeconds: 20
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consumer-service
+  namespace: log-analytics
+spec:
+  selector:
+    app: log-consumer
+  ports:
+    - port: 8001
+      targetPort: 8001
+      name: metrics
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: log-consumer-hpa
+  namespace: log-analytics
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: log-consumer
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
